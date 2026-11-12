@@ -12,12 +12,43 @@ class AnalyzeMatchTests(unittest.TestCase):
     def test_detects_matching_and_missing_keywords(self) -> None:
         result = analyze_match(
             "Requirements: Python, FastAPI, Docker, and 3+ years experience.",
-            "Python developer with 4 years experience. Skills include Python and Docker.",
+            "- Python developer with 4 years experience. Skills include Python and Docker.",
         )
 
         self.assertEqual(result["matchedKeywords"], ["Docker", "Python"])
         self.assertEqual(result["missingKeywords"], ["FastAPI"])
         self.assertEqual(result["breakdown"]["experience"], 100)
+        self.assertEqual(len(result["rewrites"]), 1)
+        suggestion = result["rewrites"][0]
+        self.assertEqual(
+            suggestion["original"],
+            "Python developer with 4 years experience. Skills include Python and Docker.",
+        )
+        self.assertIn("Docker, Python", suggestion["impact"])
+        self.assertNotIn("FastAPI", suggestion["suggested"])
+
+    def test_tailoring_suggestions_only_use_job_keywords_found_in_resume_bullets(self) -> None:
+        result = analyze_match(
+            "Requirements: React, TypeScript, Docker, and Kubernetes.",
+            (
+                "EXPERIENCE\n"
+                "- Built dashboards with React and TypeScript for customer reporting.\n"
+                "- Coordinated a design review and wrote project notes.\n"
+                "SKILLS\n"
+                "Docker, Kubernetes"
+            ),
+        )
+
+        self.assertEqual(len(result["rewrites"]), 1)
+        self.assertEqual(result["rewrites"][0]["impact"], "Role keywords already evidenced in this bullet: React, TypeScript.")
+        self.assertIn("original scope and results", result["rewrites"][0]["suggested"])
+
+    def test_returns_no_tailoring_suggestions_when_no_bullet_matches(self) -> None:
+        result = analyze_match(
+            "Requirements: Python, FastAPI.",
+            "- Coordinated project schedules and documented stakeholder decisions.",
+        )
+
         self.assertEqual(result["rewrites"], [])
 
     def test_rejects_empty_analysis_inputs(self) -> None:
@@ -66,6 +97,10 @@ class ResumeExtractionTests(unittest.TestCase):
     def test_extracts_paragraphs_and_tables_from_docx(self) -> None:
         document = Document()
         document.add_paragraph("Python resume experience")
+        document.add_paragraph(
+            "Built reliable Python services for customer reporting and internal analytics.",
+            style="List Bullet",
+        )
         table = document.add_table(rows=1, cols=1)
         table.cell(0, 0).text = "FastAPI"
         contents = BytesIO()
@@ -74,6 +109,7 @@ class ResumeExtractionTests(unittest.TestCase):
         text = extract_resume_text("resume.docx", contents.getvalue())
 
         self.assertIn("Python resume experience", text)
+        self.assertIn("• Built reliable Python services", text)
         self.assertIn("FastAPI", text)
 
 

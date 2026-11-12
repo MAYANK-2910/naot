@@ -50,6 +50,7 @@ SKILL_TERMS: dict[str, tuple[str, ...]] = {
     "Product Roadmap": ("product roadmap", "roadmap ownership"),
     "PyTorch": ("pytorch",),
     "Python": ("python",),
+    "React": ("react",),
     "R": ("r programming", "r language"),
     "REST APIs": ("rest api", "restful api", "rest apis", "restful apis"),
     "Redis": ("redis",),
@@ -99,7 +100,10 @@ def _validate_pdf(contents: bytes) -> str:
 
 def _validate_docx(contents: bytes) -> str:
     document = Document(BytesIO(contents))
-    paragraphs = [paragraph.text for paragraph in document.paragraphs]
+    paragraphs = [
+        f"• {paragraph.text}" if paragraph.style.name.startswith("List") else paragraph.text
+        for paragraph in document.paragraphs
+    ]
     table_rows = [
         " ".join(cell.text for cell in row.cells)
         for table in document.tables
@@ -128,6 +132,50 @@ def _extract_keywords(job_description: str) -> list[str]:
         for label, aliases in SKILL_TERMS.items()
         if any(_contains_term(job_description, alias) for alias in aliases)
     ]
+
+
+def _extract_resume_bullets(resume_text: str) -> list[str]:
+    bullets = []
+    for line in resume_text.splitlines():
+        match = re.match(r"^\s*(?:[-*•▪‣]\s+|\d+[.)]\s+)(.+)$", line)
+        if match and len(match.group(1).split()) >= 5:
+            bullets.append(match.group(1).strip())
+    return bullets
+
+
+def _build_tailoring_suggestions(
+    job_description: str,
+    resume_text: str,
+) -> list[dict[str, str]]:
+    job_keywords = _extract_keywords(job_description)
+    suggestions: list[tuple[int, dict[str, str]]] = []
+
+    for bullet in _extract_resume_bullets(resume_text):
+        matched = [
+            keyword
+            for keyword in job_keywords
+            if any(_contains_term(bullet, alias) for alias in SKILL_TERMS[keyword])
+        ]
+        if not matched:
+            continue
+
+        keywords = ", ".join(matched)
+        suggestions.append(
+            (
+                len(matched),
+                {
+                    "original": bullet,
+                    "suggested": (
+                        f"Move the existing mention of {keywords} closer to the start of this bullet. "
+                        "Keep the original scope and results; don't add experience that isn't stated."
+                    ),
+                    "impact": f"Role keywords already evidenced in this bullet: {keywords}.",
+                },
+            )
+        )
+
+    suggestions.sort(key=lambda item: item[0], reverse=True)
+    return [suggestion for _, suggestion in suggestions[:5]]
 
 
 def _score_experience(job_description: str, resume_text: str) -> int:
@@ -211,7 +259,7 @@ def analyze_match(job_description: str, resume_text: str) -> dict[str, object]:
         "missingKeywords": missing,
         "strengths": strengths[:3],
         "gaps": gaps[:3],
-        "rewrites": [],
+        "rewrites": _build_tailoring_suggestions(job_description, resume_text),
     }
 
 

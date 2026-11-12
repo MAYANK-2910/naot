@@ -45,7 +45,13 @@ export function ScreenerWorkspace({ screener }: { screener: Screener }) {
         />
       );
     case 'tailoring':
-      return <TailoringPage rewrites={result.rewrites} onContinue={() => setStep('report')} />;
+      return (
+        <TailoringPage
+          rewrites={result.rewrites}
+          missingKeywords={result.missingKeywords}
+          onContinue={() => setStep('report')}
+        />
+      );
     case 'report':
       return (
         <ReportPage

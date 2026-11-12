@@ -1,26 +1,26 @@
 import { Button } from '@/components/ui/Button';
-import { CopyButton } from '@/components/ui/CopyButton';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { PageHeading } from '@/components/ui/PageHeading';
 import type { BulletRewrite } from '@/types';
 
 interface TailoringPageProps {
   rewrites: BulletRewrite[];
+  missingKeywords: string[];
   onContinue: () => void;
 }
 
-export function TailoringPage({ rewrites, onContinue }: TailoringPageProps) {
+export function TailoringPage({ rewrites, missingKeywords, onContinue }: TailoringPageProps) {
   return (
     <div className="space-y-8">
       <PageHeading
         title="Resume tailoring"
-        description="Review the match gaps and tailor your resume manually. Local mode does not generate resume text."
+        description="Role-specific tips use keywords already found in resume bullets. Nothing is invented or rewritten automatically."
       />
 
       {rewrites.length === 0 ? (
         <EmptyState
-          title="Automatic rewrites are not enabled"
-          description="The local matcher reports evidence and gaps but does not invent or rewrite candidate experience."
+          title="No role-matched bullets found"
+          description="Try a different resume or review the role keywords below. Only add skills that reflect real experience."
         />
       ) : (
         <ul className="space-y-4">
@@ -28,21 +28,38 @@ export function TailoringPage({ rewrites, onContinue }: TailoringPageProps) {
             <li key={rewrite.original} className="overflow-hidden rounded-xl border border-line bg-surface">
               <div className="grid md:grid-cols-2">
                 <div className="bg-sunken p-5">
-                  <h3 className="text-xs font-medium text-faint">Original</h3>
+                  <h3 className="text-xs font-medium text-faint">Resume bullet</h3>
                   <p className="mt-2 text-sm leading-relaxed text-soft">{rewrite.original}</p>
                 </div>
                 <div className="border-t border-line p-5 md:border-l md:border-t-0">
-                  <h3 className="text-xs font-medium text-accent">Suggested</h3>
+                  <h3 className="text-xs font-medium text-accent">Tailoring tip</h3>
                   <p className="mt-2 text-sm leading-relaxed">{rewrite.suggested}</p>
                 </div>
               </div>
-              <div className="flex items-center justify-between gap-3 border-t border-line py-1.5 pl-5 pr-2">
+              <div className="border-t border-line px-5 py-3">
                 <p className="text-[13px] text-soft">{rewrite.impact}</p>
-                <CopyButton text={rewrite.suggested} label="Copy suggestion" />
               </div>
             </li>
           ))}
         </ul>
+      )}
+
+      {missingKeywords.length > 0 && (
+        <section aria-labelledby="missing-keywords-heading" className="rounded-xl border border-line bg-surface p-5">
+          <h2 id="missing-keywords-heading" className="text-sm font-semibold">
+            Keywords not found in this resume
+          </h2>
+          <p className="mt-1 text-sm text-soft">
+            Add these only if you have relevant experience that you can support with a concrete example.
+          </p>
+          <ul className="mt-3 flex flex-wrap gap-2">
+            {missingKeywords.map((keyword) => (
+              <li key={keyword} className="rounded-full bg-sunken px-3 py-1 text-sm text-soft">
+                {keyword}
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
 
       <div className="flex justify-end border-t border-line pt-6">
