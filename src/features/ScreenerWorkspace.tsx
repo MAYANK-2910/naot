@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import type { Screener } from '@/hooks/useScreener';
-import { getJobTitle } from '@/lib/jobs';
 import { AnalysisPage } from './analysis/AnalysisPage';
 import { ReportPage } from './report/ReportPage';
 import { SetupPage } from './setup/SetupPage';
@@ -29,7 +28,7 @@ export function ScreenerWorkspace({ screener }: { screener: Screener }) {
 
   const { request, result } = analysis;
   const candidateName = request.resume.name;
-  const jobTitle = getJobTitle(request.jobId, request.jobText);
+  const jobTitle = request.jobTitle;
 
   switch (step) {
     case 'analysis':

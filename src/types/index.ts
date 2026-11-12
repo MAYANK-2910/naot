@@ -4,27 +4,8 @@ export type Theme = 'light' | 'dark';
 export type Tone = 'good' | 'warn' | 'bad';
 export type FileKind = 'pdf' | 'docx';
 
-export interface JobDescription {
-  id: string;
-  title: string;
-  department: string;
-  location: string;
-  requiredSkills: string[];
-  text: string;
-}
-
-export interface SampleResume {
-  id: string;
-  candidateName: string;
-  targetRole: string;
-  fileName: string;
-  fileKind: FileKind;
-  text: string;
-}
-
-/** The resume currently selected for screening, whether a sample or an upload. */
+/** The candidate resume uploaded for screening. */
 export interface ResumeDocument {
-  sampleId?: string;
   name: string;
   fileName: string;
   fileKind: FileKind;
@@ -46,7 +27,7 @@ export interface BulletRewrite {
 }
 
 export interface AnalysisRequest {
-  jobId: string;
+  jobTitle: string;
   jobText: string;
   resume: ResumeDocument;
 }

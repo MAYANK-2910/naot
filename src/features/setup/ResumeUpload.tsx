@@ -2,8 +2,6 @@ import { useRef, useState } from 'react';
 import type { ChangeEvent, DragEvent } from 'react';
 import { FileText, Loader2, Upload } from 'lucide-react';
 import { Chip } from '@/components/ui/Chip';
-import { RadioDot } from '@/components/ui/RadioDot';
-import { SAMPLE_RESUMES } from '@/data/sampleResumes';
 import { ACCEPT_ATTRIBUTE } from '@/services/documentParser';
 import type { ResumeDocument } from '@/types';
 
@@ -12,10 +10,9 @@ interface ResumeUploadProps {
   isReading: boolean;
   error: string | null;
   onFile: (file: File) => void;
-  onSelectSample: (id: string) => void;
 }
 
-export function ResumeUpload({ resume, isReading, error, onFile, onSelectSample }: ResumeUploadProps) {
+export function ResumeUpload({ resume, isReading, error, onFile }: ResumeUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -38,7 +35,7 @@ export function ResumeUpload({ resume, isReading, error, onFile, onSelectSample 
         <h2 id="resume-heading" className="text-base font-semibold">
           Candidate resume
         </h2>
-        <p className="mt-0.5 text-sm text-soft">Upload a text-based PDF or DOCX file, or try a sample candidate.</p>
+        <p className="mt-0.5 text-sm text-soft">Upload a text-based PDF or DOCX file to screen the candidate.</p>
       </div>
 
       <div>
@@ -77,49 +74,22 @@ export function ResumeUpload({ resume, isReading, error, onFile, onSelectSample 
         )}
       </div>
 
-      <div className="flex items-center gap-3 rounded-xl border border-line bg-surface p-4">
-        <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-sunken text-soft">
-          <FileText className="size-5" aria-hidden="true" />
-        </span>
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-medium">{resume.fileName}</p>
-          <p className="truncate text-[13px] text-soft">{resume.name}</p>
+      {resume.fileName ? (
+        <div className="flex items-center gap-3 rounded-xl border border-line bg-surface p-4">
+          <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-sunken text-soft">
+            <FileText className="size-5" aria-hidden="true" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-medium">{resume.fileName}</p>
+            <p className="truncate text-[13px] text-soft">{resume.name}</p>
+          </div>
+          <Chip>Uploaded {resume.fileKind.toUpperCase()}</Chip>
         </div>
-        <Chip>{resume.isUpload ? `Uploaded ${resume.fileKind.toUpperCase()}` : resume.fileKind.toUpperCase()}</Chip>
-      </div>
-
-      <div>
-        <h3 id="samples-heading" className="mb-2 text-sm font-medium">
-          Sample candidates
-        </h3>
-        <div
-          role="radiogroup"
-          aria-labelledby="samples-heading"
-          className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-surface"
-        >
-          {SAMPLE_RESUMES.map((sample) => {
-            const selected = resume.sampleId === sample.id;
-            return (
-              <button
-                key={sample.id}
-                type="button"
-                role="radio"
-                aria-checked={selected}
-                onClick={() => onSelectSample(sample.id)}
-                className={`flex w-full items-center justify-between gap-4 px-4 py-3 text-left transition-colors -outline-offset-2 ${
-                  selected ? 'bg-sunken' : 'hover:bg-sunken/60'
-                }`}
-              >
-                <span className="min-w-0">
-                  <span className="block text-sm font-medium">{sample.candidateName}</span>
-                  <span className="block text-[13px] text-soft">{sample.targetRole}</span>
-                </span>
-                <RadioDot selected={selected} />
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      ) : (
+        <p className="rounded-lg bg-sunken px-4 py-3 text-sm text-soft">
+          No resume uploaded yet. Upload a PDF or DOCX to continue.
+        </p>
+      )}
     </section>
   );
 }

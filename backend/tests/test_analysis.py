@@ -11,6 +11,7 @@ from backend.main import analyze_match, extract_resume_text
 class AnalyzeMatchTests(unittest.TestCase):
     def test_detects_matching_and_missing_keywords(self) -> None:
         result = analyze_match(
+            "Senior Engineer",
             "Requirements: Python, FastAPI, Docker, and 3+ years experience.",
             "- Python developer with 4 years experience. Skills include Python and Docker.",
         )
@@ -29,6 +30,7 @@ class AnalyzeMatchTests(unittest.TestCase):
 
     def test_tailoring_suggestions_only_use_job_keywords_found_in_resume_bullets(self) -> None:
         result = analyze_match(
+            "Frontend Engineer",
             "Requirements: React, TypeScript, Docker, and Kubernetes.",
             (
                 "EXPERIENCE\n"
@@ -45,6 +47,7 @@ class AnalyzeMatchTests(unittest.TestCase):
 
     def test_returns_no_tailoring_suggestions_when_no_bullet_matches(self) -> None:
         result = analyze_match(
+            "Coordinator",
             "Requirements: Python, FastAPI.",
             "- Coordinated project schedules and documented stakeholder decisions.",
         )
@@ -53,12 +56,21 @@ class AnalyzeMatchTests(unittest.TestCase):
 
     def test_rejects_empty_analysis_inputs(self) -> None:
         with self.assertRaises(HTTPException) as raised:
-            analyze_match("   ", "resume")
+            analyze_match("Developer", "   ", "resume")
 
         self.assertEqual(raised.exception.status_code, 422)
 
     def test_does_not_report_missing_years_when_job_has_no_years_requirement(self) -> None:
-        result = analyze_match("Required skills: Python.", "Python developer.")
+        result = analyze_match("Developer", "Required skills: Python.", "Python developer.")
+
+    def test_role_title_keywords_are_included_in_matching(self) -> None:
+        result = analyze_match(
+            "React Engineer",
+            "Requirements: TypeScript.",
+            "- Built customer dashboards with React for business reporting.",
+        )
+
+        self.assertIn("React", result["matchedKeywords"])
 
         self.assertFalse(any("years-of-experience" in gap for gap in result["gaps"]))
 

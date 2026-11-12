@@ -5,7 +5,11 @@ import { ResumeUpload } from './ResumeUpload';
 import { RoleSelector } from './RoleSelector';
 
 export function SetupPage({ screener }: { screener: Screener }) {
-  const canRun = screener.jobText.trim().length > 0 && !screener.isReadingFile;
+  const canRun =
+    screener.jobTitle.trim().length > 0 &&
+    screener.jobText.trim().length > 0 &&
+    screener.resume.text.trim().length > 0 &&
+    !screener.isReadingFile;
 
   return (
     <div>
@@ -16,9 +20,9 @@ export function SetupPage({ screener }: { screener: Screener }) {
 
       <div className="mt-10 grid gap-12 lg:grid-cols-2">
         <RoleSelector
-          selectedId={screener.jobId}
+          title={screener.jobTitle}
           text={screener.jobText}
-          onSelect={screener.selectJob}
+          onTitleChange={screener.editJobTitle}
           onTextChange={screener.editJobText}
         />
         <ResumeUpload
@@ -26,7 +30,6 @@ export function SetupPage({ screener }: { screener: Screener }) {
           isReading={screener.isReadingFile}
           error={screener.uploadError}
           onFile={screener.uploadResume}
-          onSelectSample={screener.selectSample}
         />
       </div>
 
@@ -44,7 +47,7 @@ export function SetupPage({ screener }: { screener: Screener }) {
                 <span className="font-medium text-ink">{screener.jobTitle}</span>
               </>
             ) : (
-              'Add a job description to continue.'
+              'Enter the role title and job description, and upload a resume.'
             )}
           </p>
           <Button variant="primary" disabled={!canRun} loading={screener.isAnalyzing} onClick={screener.runAnalysis}>

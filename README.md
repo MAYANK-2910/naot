@@ -52,7 +52,6 @@ src/
 ├── App.tsx                      Page shell: header, step navigation, view switch
 ├── index.css                    Design tokens (light and dark), fonts, print styles
 ├── types/                       Shared TypeScript types
-├── data/                        Static content: job descriptions and sample resumes
 ├── services/
 │   ├── screeningApi.ts          Calls the local Python matcher
 │   └── documentParser.ts        Upload validation and backend text extraction
@@ -60,7 +59,7 @@ src/
 │   ├── useScreener.ts           All screening state and actions
 │   ├── useTheme.ts              Light/dark theme, remembered between visits
 │   └── useClipboard.ts          Copy-to-clipboard with a "Copied" state
-├── lib/                         Small pure helpers (score bands, tone classes, job titles)
+├── lib/                         Small pure helpers (score bands and tone classes)
 ├── components/
 │   ├── layout/                  Header, StepNav, PageContainer
 │   └── ui/                      Button, Chip, Notice, Field, CodeBlock, and so on
@@ -83,7 +82,7 @@ Rule of thumb: components in `features/` and `components/` only render. State li
 
 The backend uses a curated skills dictionary and simple evidence checks, not a generative AI model.
 Scores are indicative and should not be used as the sole basis for hiring decisions. Bullet rewrites
-are left empty rather than generated or inferred. PDF extraction requires selectable text; scanned
+are evidence-based tips rather than generated or inferred. PDF extraction requires selectable text; scanned
 PDFs and legacy `.doc` files are not supported. Uploaded files are processed by the local backend
 and are not sent to an external model.
 

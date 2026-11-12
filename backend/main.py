@@ -87,6 +87,7 @@ RESUME_SECTIONS = ("experience", "skills", "education", "summary", "projects")
 
 
 class MatchRequest(BaseModel):
+    job_title: str = Field(min_length=1, max_length=500)
     job_description: str = Field(min_length=1, max_length=100_000)
     resume_text: str = Field(min_length=1, max_length=100_000)
 
@@ -204,11 +205,12 @@ def _score_ats(resume_text: str) -> int:
     return min(100, 25 + sections * 12 + (25 if has_contact else 0))
 
 
-def analyze_match(job_description: str, resume_text: str) -> dict[str, object]:
-    if not job_description.strip() or not resume_text.strip():
-        raise HTTPException(status_code=422, detail="Job description and resume text are required.")
+def analyze_match(job_title: str, job_description: str, resume_text: str) -> dict[str, object]:
+    if not job_title.strip() or not job_description.strip() or not resume_text.strip():
+        raise HTTPException(status_code=422, detail="Role title, job description, and resume text are required.")
 
-    keywords = _extract_keywords(job_description)
+    role_text = f"{job_title}\n{job_description}"
+    keywords = _extract_keywords(role_text)
     matched = [term for term in keywords if any(_contains_term(resume_text, alias) for alias in SKILL_TERMS[term])]
     missing = [term for term in keywords if term not in matched]
     skills_score = round(len(matched) / len(keywords) * 100) if keywords else 50
@@ -259,7 +261,7 @@ def analyze_match(job_description: str, resume_text: str) -> dict[str, object]:
         "missingKeywords": missing,
         "strengths": strengths[:3],
         "gaps": gaps[:3],
-        "rewrites": _build_tailoring_suggestions(job_description, resume_text),
+        "rewrites": _build_tailoring_suggestions(role_text, resume_text),
     }
 
 
@@ -301,4 +303,4 @@ async def extract_text(file: Annotated[UploadFile, File(...)]) -> dict[str, str]
 
 @app.post("/api/v1/analyze-match")
 def analyze_match_endpoint(request: MatchRequest) -> dict[str, object]:
-    return analyze_match(request.job_description, request.resume_text)
+    return analyze_match(request.job_title, request.job_description, request.resume_text)

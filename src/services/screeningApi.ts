@@ -41,6 +41,7 @@ export async function analyzeMatch(request: AnalysisRequest): Promise<AnalysisRe
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
+      job_title: request.jobTitle,
       job_description: request.jobText,
       resume_text: request.resume.text,
     }),
