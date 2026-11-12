@@ -1,4 +1,4 @@
-import { FileCheck2, Moon, Sun } from 'lucide-react';
+import { Moon, Sun, UsersRound } from 'lucide-react';
 import type { Theme, View } from '@/types';
 
 const VIEWS: { id: View; label: string }[] = [
@@ -19,9 +19,9 @@ export function Header({ view, onViewChange, theme, onToggleTheme }: HeaderProps
       <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4 sm:px-6">
         <div className="flex items-center gap-2.5">
           <span className="grid size-7 place-items-center rounded-md bg-ink text-surface">
-            <FileCheck2 className="size-4" aria-hidden="true" />
+            <UsersRound className="size-4" aria-hidden="true" />
           </span>
-          <span className="text-[15px] font-semibold tracking-tight">Resume Screener</span>
+          <span className="text-[15px] font-semibold tracking-tight">CandidateSync</span>
         </div>
 
         <div className="flex items-center gap-2">

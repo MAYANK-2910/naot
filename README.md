@@ -1,4 +1,4 @@
-# Resume Screener
+# CandidateSync
 
 Compare a resume with a job description, review keyword matches and gaps, and export a one-page report.
 The local Python service uses explainable matching heuristics, not a hosted AI model.

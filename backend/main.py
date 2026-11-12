@@ -9,7 +9,7 @@ from docx.opc.exceptions import PackageNotFoundError
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from pydantic import BaseModel, Field
 
-app = FastAPI(title="Resume Screener Local Matcher", version="1.0.0")
+app = FastAPI(title="CandidateSync Local Matcher", version="1.0.0")
 
 MAX_UPLOAD_BYTES = 10 * 1024 * 1024
 
