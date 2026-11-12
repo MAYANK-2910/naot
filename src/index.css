@@ -1,0 +1,132 @@
+@import "tailwindcss";
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/geist-mono";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+  Design tokens.
+  Ink and neutral greys carry structure. Cobalt marks focus and suggested edits.
+  Green, amber and red appear only where they describe match quality.
+  `.paper` always uses the light palette so printed reports stay readable in dark mode.
+*/
+:root,
+.paper {
+  --canvas: #f5f6f8;
+  --surface: #ffffff;
+  --sunken: #eef0f3;
+  --ink: #12151b;
+  --soft: #4a5260;
+  --faint: #667085;
+  --line: #e2e5ea;
+  --strong: #cbd0d8;
+  --accent: #2f55d4;
+  --good: #17794e;
+  --good-bg: #e7f5ee;
+  --warn: #9a5b00;
+  --warn-bg: #fcf1dc;
+  --bad: #b42318;
+  --bad-bg: #fdecea;
+  color-scheme: light;
+}
+
+.dark {
+  --canvas: #0e1014;
+  --surface: #151820;
+  --sunken: #1c202a;
+  --ink: #eceef2;
+  --soft: #aab1be;
+  --faint: #8a92a1;
+  --line: #262b36;
+  --strong: #394050;
+  --accent: #8fa8ff;
+  --good: #5fd39a;
+  --good-bg: #12281f;
+  --warn: #f0b44c;
+  --warn-bg: #2b2210;
+  --bad: #ff8a7a;
+  --bad-bg: #2e1714;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --font-sans: "Geist Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "Geist Mono Variable", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-sunken: var(--sunken);
+  --color-ink: var(--ink);
+  --color-soft: var(--soft);
+  --color-faint: var(--faint);
+  --color-line: var(--line);
+  --color-strong: var(--strong);
+  --color-accent: var(--accent);
+  --color-good: var(--good);
+  --color-good-bg: var(--good-bg);
+  --color-warn: var(--warn);
+  --color-warn-bg: var(--warn-bg);
+  --color-bad: var(--bad);
+  --color-bad-bg: var(--bad-bg);
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background: var(--canvas);
+    color: var(--ink);
+    font-size: 0.9375rem;
+    line-height: 1.55;
+  }
+
+  button:not(:disabled),
+  [role="button"] {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@page {
+  margin: 18mm;
+}
+
+@media print {
+  html,
+  body {
+    background: #fff !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-sheet {
+    border: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    max-width: none !important;
+  }
+}
